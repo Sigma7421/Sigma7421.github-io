@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RoundCaller</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <section class="stage" aria-labelledby="app-title">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Smart bag round caller</p>
+            <h1 id="app-title">RoundCaller</h1>
+          </div>
+          <div class="round-clock" aria-live="polite">
+            <span id="phaseLabel">Ready</span>
+            <strong id="clock">03:00</strong>
+          </div>
+        </div>
+
+        <div class="coach-panel">
+          <div class="cue-card">
+            <p class="cue-label">Next call</p>
+            <div id="currentCue" class="cue-text">Choose a drill and start</div>
+            <div class="hit-progress" aria-label="Combo hit progress">
+              <div id="hitDots" class="hit-dots"></div>
+              <span id="hitCount">0 / 0</span>
+            </div>
+          </div>
+
+          <div class="meters">
+            <div>
+              <span>Mic level</span>
+              <meter id="levelMeter" min="0" max="1" value="0"></meter>
+            </div>
+            <div>
+              <span>Threshold</span>
+              <input id="threshold" type="range" min="0.04" max="0.65" step="0.01" value="0.22">
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="startBtn" class="primary" type="button">Start round</button>
+          <button id="pauseBtn" type="button" disabled>Pause</button>
+          <button id="calibrateBtn" type="button">Calibrate mic</button>
+          <button id="simulateBtn" type="button">Simulate hit</button>
+        </div>
+      </section>
+
+      <aside class="side">
+        <section class="panel">
+          <h2>Drill Pack</h2>
+          <div class="segmented" role="radiogroup" aria-label="Drill pack">
+            <label><input type="radio" name="pack" value="fundamentals" checked> Fundamentals</label>
+            <label><input type="radio" name="pack" value="defense"> Defense</label>
+            <label><input type="radio" name="pack" value="conditioning"> Conditioning</label>
+          </div>
+        </section>
+
+        <section class="panel grid-2">
+          <label>
+            Round
+            <select id="roundLength">
+              <option value="120">2:00</option>
+              <option value="180" selected>3:00</option>
+              <option value="240">4:00</option>
+            </select>
+          </label>
+          <label>
+            Rest
+            <select id="restLength">
+              <option value="30">0:30</option>
+              <option value="60" selected>1:00</option>
+              <option value="90">1:30</option>
+            </select>
+          </label>
+          <label>
+            Pace
+            <select id="pace">
+              <option value="easy">Easy</option>
+              <option value="sharp" selected>Sharp</option>
+              <option value="hard">Hard</option>
+            </select>
+          </label>
+          <label>
+            Voice
+            <select id="voiceMode">
+              <option value="full" selected>Full cue</option>
+              <option value="numbers">Numbers</option>
+              <option value="short">Short</option>
+            </select>
+          </label>
+        </section>
+
+        <section class="panel stats">
+          <h2>Round Stats</h2>
+          <dl>
+            <div><dt>Punches</dt><dd id="statPunches">0</dd></div>
+            <div><dt>Combos</dt><dd id="statCombos">0</dd></div>
+            <div><dt>Avg pace</dt><dd id="statPace">0/min</dd></div>
+            <div><dt>Longest gap</dt><dd id="statGap">0.0s</dd></div>
+          </dl>
+        </section>
+
+        <section class="panel log-panel">
+          <h2>Call Log</h2>
+          <ol id="callLog"></ol>
+        </section>
+      </aside>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
