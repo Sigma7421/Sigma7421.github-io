@@ -31,6 +31,19 @@ const paceConfig = {
   hard: { gap: 2800, delay: 470, cooldown: 150 }
 };
 
+const motivationLines = [
+  "Stay on it.",
+  "Hands back, chin down.",
+  "Breathe, then fire.",
+  "Win the next exchange.",
+  "Make the bag answer.",
+  "Small steps, sharp shots.",
+  "Reset and go again.",
+  "Keep working.",
+  "One clean combo at a time.",
+  "Finish strong."
+];
+
 const state = {
   running: false,
   paused: false,
@@ -45,6 +58,7 @@ const state = {
   roundStartedAt: 0,
   remainingMs: 180000,
   timerId: null,
+  availableVoices: [],
   audio: null,
   analyser: null,
   data: null,
@@ -63,6 +77,7 @@ const els = {
   restLength: document.querySelector("#restLength"),
   pace: document.querySelector("#pace"),
   voiceMode: document.querySelector("#voiceMode"),
+  coachStyle: document.querySelector("#coachStyle"),
   currentCue: document.querySelector("#currentCue"),
   hitDots: document.querySelector("#hitDots"),
   hitCount: document.querySelector("#hitCount"),
@@ -95,6 +110,13 @@ els.simulateBtn.addEventListener("click", () => recordHit(true));
 els.threshold.addEventListener("input", () => {
   state.threshold = Number(els.threshold.value);
 });
+
+if ("speechSynthesis" in window) {
+  state.availableVoices = window.speechSynthesis.getVoices();
+  window.speechSynthesis.addEventListener("voiceschanged", () => {
+    state.availableVoices = window.speechSynthesis.getVoices();
+  });
+}
 
 function selectedPack() {
   return document.querySelector("input[name='pack']:checked").value;
@@ -223,6 +245,7 @@ function recordHit(fromButton = false) {
     state.comboCount += 1;
     updateStats();
     state.cue = null;
+    maybeMotivate();
     nextCue();
   }
 }
@@ -307,9 +330,30 @@ function speak(text) {
   if (!("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 1.08;
-  utterance.pitch = 0.88;
+  const gritty = els.coachStyle.value === "corner";
+  utterance.rate = gritty ? 0.96 : 1.08;
+  utterance.pitch = gritty ? 0.68 : 0.88;
+  const voice = pickVoice(gritty);
+  if (voice) utterance.voice = voice;
   window.speechSynthesis.speak(utterance);
+}
+
+function maybeMotivate() {
+  if (els.coachStyle.value !== "corner") return;
+  if (state.comboCount % 3 !== 0) return;
+  const line = motivationLines[Math.floor(Math.random() * motivationLines.length)];
+  window.setTimeout(() => speak(line), 140);
+}
+
+function pickVoice(gritty) {
+  if (!state.availableVoices.length) return null;
+  if (!gritty) {
+    return state.availableVoices.find((voice) => voice.default) || state.availableVoices[0];
+  }
+  return state.availableVoices.find((voice) => {
+    const name = voice.name.toLowerCase();
+    return voice.lang.startsWith("en") && (name.includes("male") || name.includes("david") || name.includes("mark"));
+  }) || state.availableVoices.find((voice) => voice.lang.startsWith("en")) || state.availableVoices[0];
 }
 
 function renderHitProgress(done, total) {
